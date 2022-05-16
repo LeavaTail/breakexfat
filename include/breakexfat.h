@@ -49,5 +49,11 @@ extern unsigned int print_level;
 #define pr_debug(fmt, ...) print(PRINT_DEBUG, fmt, ##__VA_ARGS__)
 #define pr_msg(fmt, ...)   fprintf(stdout, fmt, ##__VA_ARGS__)
 
+int get_sector(struct super_block *sb, void *data, off_t index, size_t count);
+int set_sector(struct super_block *sb, void *data, off_t index, size_t count);
+int print_sector(struct super_block *sb, off_t index, size_t count);
+int get_cluster(struct super_block *sb, void *data, off_t index, size_t count);
+int set_cluster(struct super_block *sb, void *data, off_t index, size_t count);
+int print_cluster(struct super_block *sb, off_t index, size_t count);
 
 #endif /*_DEBUGFATFS_H */
