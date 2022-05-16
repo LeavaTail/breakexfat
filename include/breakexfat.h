@@ -56,4 +56,9 @@ int get_cluster(struct super_block *sb, void *data, off_t index, size_t count);
 int set_cluster(struct super_block *sb, void *data, off_t index, size_t count);
 int print_cluster(struct super_block *sb, off_t index, size_t count);
 
+int initialize_super(struct super_block *sb, const char *name);
+int finalize_super(struct super_block *sb);
+int read_boot_sector(struct super_block *sb);
+int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
+
 #endif /*_DEBUGFATFS_H */
