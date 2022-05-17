@@ -4,7 +4,10 @@
  */
 #include <getopt.h>
 
+#include "exfat.h"
 #include "breakexfat.h"
+#include "cache.h"
+#include "list.h"
 
 unsigned int print_level = PRINT_WARNING;
 
@@ -55,6 +58,7 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	int longindex;
+	struct super_block sb = {0};
 
 	while ((opt = getopt_long(argc, argv,
 					"",
@@ -80,6 +84,10 @@ int main(int argc, char *argv[])
 		usage();
 		exit(EXIT_FAILURE);
 	}
+
+	initialize_super(&sb, argv[1]);
+	read_boot_sector(&sb);
+	finalize_super(&sb);
 
 	return 0;
 }

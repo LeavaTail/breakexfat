@@ -1,6 +1,9 @@
 bin_PROGRAMS = breakexfat
 
-breakexfat_SOURCES = src/main.c
+breakexfat_SOURCES = src/main.c \
+			src/super.c \
+			src/cluster.c \
+			src/cache.c
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 

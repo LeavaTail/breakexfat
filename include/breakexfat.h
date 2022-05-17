@@ -11,7 +11,10 @@
 #include <string.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <errno.h>
 #include <linux/types.h>
+
+#include "exfat.h"
 
 /**
  * Program Name, version, author.
