@@ -106,9 +106,9 @@ int read_boot_sector(struct super_block *sb);
 int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
 int read_fat_region(struct super_block *sb);
 
-struct cache *create_cluster_cache(struct super_block *sb, __le32 index, size_t count);
-struct cache *create_sector_cache(struct super_block *sb, __le32 index, size_t count);
-struct cache *search_cache(struct super_block *sb, struct list_head *head, __le32 index);
+struct cache *create_cluster_cache(struct super_block *sb, uint32_t index, size_t count);
+struct cache *create_sector_cache(struct super_block *sb, uint32_t index, size_t count);
+struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index);
 int remove_cache(struct super_block *sb, struct list_head *prev);
 int remove_cache_list(struct super_block *sb, struct list_head *head);
 

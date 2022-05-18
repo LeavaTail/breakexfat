@@ -15,7 +15,7 @@
  * @return       != NULL (success)
  *               == NULL (failed)
  */
-static struct cache *create_cache(struct super_block *sb, __le32 index, size_t count)
+static struct cache *create_cache(struct super_block *sb, uint32_t index, size_t count)
 {
 	struct cache *cache;
 
@@ -45,7 +45,7 @@ static struct cache *create_cache(struct super_block *sb, __le32 index, size_t c
  * @return                != NULL (success)
  *                        == NULL (failed)
  */
-struct cache *create_cluster_cache(struct super_block *sb, __le32 index, size_t count)
+struct cache *create_cluster_cache(struct super_block *sb, uint32_t index, size_t count)
 {
 	void *data;
 	struct cache *clu;
@@ -84,7 +84,7 @@ err:
  * @return               != NULL (success)
  *                       == NULL (failed)
  */
-struct cache *create_sector_cache(struct super_block *sb, __le32 index, size_t count)
+struct cache *create_sector_cache(struct super_block *sb, uint32_t index, size_t count)
 {
 	void *data;
 	struct cache *clu;
@@ -123,7 +123,7 @@ err:
  * @return        != NULL (success)
  *                == NULL (failed)
  */
-struct cache *search_cache(struct super_block *sb, struct list_head *head, __le32 index)
+struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index)
 {
 	struct list_head *node;
 	struct cache *cache;

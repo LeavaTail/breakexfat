@@ -7,6 +7,7 @@
 #define _EXFAT_H
 
 #include <stdio.h>
+#include <stdint.h>
 #include <linux/types.h>
 
 #include "list.h"
@@ -22,20 +23,20 @@ struct super_block {
 	int fd;
 	off_t total_size;
 
-	__le64 part_offset;
-	__le32 vol_size;
-	__le16 sector_size;
-	__le32 cluster_size;
-	__le32 cluster_count;
-	__le32 fat_offset;
-	__le32 fat_length;
-	__u8 num_fats;
-	__le32 heap_offset;
-	__le32 root_offset;
-	__le32 alloc_offset;
-	__le64 alloc_length;
-	__le32 upcase_offset;
-	__le32 upcase_size;
+	uint64_t part_offset;
+	uint32_t vol_size;
+	uint16_t sector_size;
+	uint32_t cluster_size;
+	uint32_t cluster_count;
+	uint32_t fat_offset;
+	uint32_t fat_length;
+	uint8_t num_fats;
+	uint32_t heap_offset;
+	uint32_t root_offset;
+	uint32_t alloc_offset;
+	uint64_t alloc_length;
+	uint32_t upcase_offset;
+	uint32_t upcase_size;
 
 	struct list_head *sector_list;
 	struct list_head *cluster_list;
@@ -45,9 +46,9 @@ struct super_block {
  * exFAT filesystem inode
  */
 struct inode {
-	__le16 attr;
-	__le32 clu;
-	__le64 len;
+	uint16_t attr;
+	uint32_t clu;
+	uint64_t len;
 };
 
 #define BOOTSEC_JUMPBOOT_LEN		3
