@@ -82,6 +82,17 @@ static inline uint64_t power2(uint32_t n)
 	return 1 << n;
 }
 
+static inline int validate_cluster(struct super_block *sb, uint32_t clu)
+{
+	if (clu < EXFAT_FIRST_CLUSTER)
+		return -EINVAL;
+	if (clu > sb->cluster_count + 1)
+		return -EINVAL;
+	if (clu == EXFAT_BADCLUSTER)
+		return -EINVAL;
+	return 0;
+}
+
 int get_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int set_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int print_sector(struct super_block *sb, off_t index, size_t count);
@@ -93,6 +104,7 @@ int initialize_super(struct super_block *sb, const char *name);
 int finalize_super(struct super_block *sb);
 int read_boot_sector(struct super_block *sb);
 int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
+int read_fat_region(struct super_block *sb);
 
 struct cache *create_cluster_cache(struct super_block *sb, __le32 index, size_t count);
 struct cache *create_sector_cache(struct super_block *sb, __le32 index, size_t count);
@@ -102,5 +114,9 @@ int remove_cache_list(struct super_block *sb, struct list_head *head);
 
 int enable_break_pattern(struct super_block *sb, unsigned int index);
 int disable_break_pattern(struct super_block *sb, unsigned int index);
+
+int update_active_fat(struct super_block *sb, int index);
+int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry);
+int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry);
 
 #endif /*_DEBUGFATFS_H */

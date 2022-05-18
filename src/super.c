@@ -139,3 +139,30 @@ int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
 
 	return 0;
 }
+
+/**
+ * read_fat_region - read boot sector in exFAT
+ * @sb:              Filesystem metadata
+ *
+ * @return           == 0 (success)
+ *                   <  0 (failed)
+ */
+int read_fat_region(struct super_block *sb)
+{
+	size_t sectors = ROUNDUP(sb->fat_length, sb->sector_size);
+	struct cache *fat1, *fat2;
+
+	if ((fat1 = create_sector_cache(sb, sb->fat_offset, sectors)) == NULL)
+		return -EINVAL;
+	list_add_tail(sb->sector_list, fat1);
+
+	if (sb->num_fats == 1)
+		return 0;
+
+	if ((fat2 = create_sector_cache(sb, sb->fat_offset + sb->fat_length, sectors)) == NULL)
+		return -EINVAL;
+	list_add_tail(sb->sector_list, fat2);
+
+	return 0;
+}
+
