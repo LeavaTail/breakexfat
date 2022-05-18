@@ -68,6 +68,20 @@ struct cache {
 	struct list_head *next;
 };
 
+#define MAX(a, b)      ((a) > (b) ? (a) : (b))
+#define MIN(a, b)      ((a) < (b) ? (a) : (b))
+#define ROUNDUP(a, b)  ((a + b - 1) / b)
+
+static inline bool is_power2(unsigned int n)
+{
+	return (n != 0 && ((n & (n - 1)) == 0));
+}
+
+static inline uint64_t power2(uint32_t n)
+{
+	return 1 << n;
+}
+
 int get_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int set_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int print_sector(struct super_block *sb, off_t index, size_t count);
