@@ -5,7 +5,6 @@
 
 #include "exfat.h"
 #include "breakexfat.h"
-#include "cache.h"
 
 /**
  * break exFAT image

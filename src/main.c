@@ -6,7 +6,6 @@
 
 #include "exfat.h"
 #include "breakexfat.h"
-#include "cache.h"
 #include "list.h"
 
 #define MANDATORY_ARGUMENT 2
@@ -117,6 +116,7 @@ int main(int argc, char *argv[])
 
 	initialize_super(&sb, argv[1]);
 	read_boot_sector(&sb);
+	read_fat_region(&sb);
 	parse_break_pattern(&sb, argv[2]);
 	finalize_super(&sb);
 

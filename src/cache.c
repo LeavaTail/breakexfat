@@ -4,7 +4,6 @@
  */
 #include "exfat.h"
 #include "breakexfat.h"
-#include "cache.h"
 #include "list.h"
 
 /**

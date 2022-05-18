@@ -10,7 +10,7 @@
 #include "exfat.h"
 #include "breakexfat.h"
 #include "endian.h"
-#include "cache.h"
+#include "list.h"
 
 /**
  * initialize_super - initialize super_block

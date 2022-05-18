@@ -15,6 +15,7 @@
 #include <linux/types.h>
 
 #include "exfat.h"
+#include "list.h"
 
 /**
  * Program Name, version, author.
@@ -52,6 +53,21 @@ extern unsigned int print_level;
 #define pr_debug(fmt, ...) print(PRINT_DEBUG, fmt, ##__VA_ARGS__)
 #define pr_msg(fmt, ...)   fprintf(stdout, fmt, ##__VA_ARGS__)
 
+/**
+ * Cached data (sector/cluster)
+ */
+struct cache {
+	struct super_block *sb;
+	void *data;
+	off_t offset;
+	size_t count;
+	bool dirty;
+	int (*read)(struct super_block *, void *, off_t, size_t);
+	int (*write)(struct super_block *, void *, off_t, size_t);
+	int (*print)(struct super_block *, off_t, size_t);
+	struct list_head *next;
+};
+
 int get_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int set_sector(struct super_block *sb, void *data, off_t index, size_t count);
 int print_sector(struct super_block *sb, off_t index, size_t count);
@@ -63,6 +79,12 @@ int initialize_super(struct super_block *sb, const char *name);
 int finalize_super(struct super_block *sb);
 int read_boot_sector(struct super_block *sb);
 int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
+
+struct cache *create_cluster_cache(struct super_block *sb, __le32 index, size_t count);
+struct cache *create_sector_cache(struct super_block *sb, __le32 index, size_t count);
+struct cache *search_cache(struct super_block *sb, struct list_head *head, __le32 index);
+int remove_cache(struct super_block *sb, struct list_head *prev);
+int remove_cache_list(struct super_block *sb, struct list_head *head);
 
 int enable_break_pattern(struct super_block *sb, unsigned int index);
 int disable_break_pattern(struct super_block *sb, unsigned int index);
