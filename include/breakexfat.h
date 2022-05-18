@@ -64,4 +64,7 @@ int finalize_super(struct super_block *sb);
 int read_boot_sector(struct super_block *sb);
 int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
 
+int enable_break_pattern(struct super_block *sb, unsigned int index);
+int disable_break_pattern(struct super_block *sb, unsigned int index);
+
 #endif /*_DEBUGFATFS_H */
