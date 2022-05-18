@@ -9,6 +9,8 @@
 #include "cache.h"
 #include "list.h"
 
+#define MANDATORY_ARGUMENT 2
+
 unsigned int print_level = PRINT_WARNING;
 
 /**
@@ -31,7 +33,7 @@ static struct option const longopts[] =
  */
 static void usage(void)
 {
-	fprintf(stderr, "Usage: %s [OPTION]... FILE\n", PROGRAM_NAME);
+	fprintf(stderr, "Usage: %s [OPTION]... FILE [PATTERN,...]\n", PROGRAM_NAME);
 	fprintf(stderr, "break FAT/exFAT filesystem image.\n");
 	fprintf(stderr, "\n");
 }
@@ -47,6 +49,34 @@ static void version(const char *command_name, const char *version, const char *a
 	fprintf(stdout, "%s %s\n", command_name, version);
 	fprintf(stdout, "\n");
 	fprintf(stdout, "Written by %s.\n", author);
+}
+
+/**
+ * parse_break_pattern - Parse cmdline argument
+ * @sb:                  Filesystem metadata
+ * @line:                 cmdline argument
+ *
+ * @return               == 0 (success)
+ *                       <  0 (failed)
+ */
+int parse_break_pattern(struct super_block *sb, char *line)
+{
+	long pattern;
+	char *ptr, *end;
+
+	ptr = strtok(line, ",");
+
+	while (ptr != NULL) {
+		pattern = strtol(ptr, &end, 10);
+		if (*end != '\0') {
+			pr_warn("Irregular character found %s\n", end);
+			return -EINVAL;
+		}
+		enable_break_pattern(sb, pattern);
+		ptr = strtok(NULL, ",");
+	}
+
+	return 0;
 }
 
 /**
@@ -80,13 +110,14 @@ int main(int argc, char *argv[])
 	print_level = PRINT_DEBUG;
 #endif
 
-	if (optind != argc - 1) {
+	if (optind != argc - MANDATORY_ARGUMENT) {
 		usage();
 		exit(EXIT_FAILURE);
 	}
 
 	initialize_super(&sb, argv[1]);
 	read_boot_sector(&sb);
+	parse_break_pattern(&sb, argv[2]);
 	finalize_super(&sb);
 
 	return 0;
