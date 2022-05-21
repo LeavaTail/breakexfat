@@ -41,6 +41,7 @@ int initialize_super(struct super_block *sb, const char *name)
 	}
 	sb->total_size = stat.st_size;
 
+	sb->inodes = NULL;
 	sb->sector_list = NULL;
 	sb->cluster_list = NULL;
 
@@ -103,6 +104,7 @@ int read_boot_sector(struct super_block *sb)
 
 	sb->sector_list = init_list_head(create_sector_cache(sb, 0, 1));
 	sb->cluster_list = init_list_head(create_cluster_cache(sb, sb->root_offset, 1));
+	sb->inodes = init_list_head(read_root_directory(sb));
 out:
 	free(boot);
 
@@ -164,5 +166,55 @@ int read_fat_region(struct super_block *sb)
 	list_add_tail(sb->sector_list, fat2);
 
 	return 0;
+}
+
+/**
+ * alloc_inode - allocate inode
+ * @sb:          Filesystem metadata
+ *
+ * @return       == 0 (success)
+ *               <  0 (failed)
+ */
+struct inode *alloc_inode(struct super_block *sb)
+{
+	struct inode *inode;
+	time_t now = time(NULL);
+
+	if ((inode = calloc(1, sizeof(struct inode))) == NULL)
+		return NULL;
+
+	if ((inode->name = malloc(sizeof(char) * (MAX_NAME_LENGTH + 1))) == NULL)
+		return NULL;
+
+	localtime_r(&now, &inode->mtime);
+	localtime_r(&now, &inode->atime);
+	localtime_r(&now, &inode->ctime);
+	inode->refcount = 1;
+
+	return inode;
+}
+
+/**
+ * read_root_directory - read boot sector in exFAT
+ * @sb:                  Filesystem metadata
+ *
+ * @return               == 0 (success)
+ *                       <  0 (failed)
+ */
+struct inode *read_root_directory(struct super_block *sb)
+{
+	struct inode *root;
+
+	root = alloc_inode(sb);
+	if (!root) {
+		pr_warn("Failed to allocate inode.\n");
+		return NULL;
+	}
+
+	strncpy(root->name, "/", strlen("/") + 1);
+	root->name_len = 1;
+	root->clu = sb->root_offset;
+
+	return root;
 }
 

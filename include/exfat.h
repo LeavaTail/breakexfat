@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
+#include <stdatomic.h>
 #include <linux/types.h>
 
 #include "list.h"
@@ -38,6 +40,8 @@ struct super_block {
 	uint32_t upcase_offset;
 	uint32_t upcase_size;
 
+	struct list_head *inodes;
+
 	struct list_head *sector_list;
 	struct list_head *cluster_list;
 };
@@ -46,9 +50,19 @@ struct super_block {
  * exFAT filesystem inode
  */
 struct inode {
+	char *name;
+	uint8_t name_len;
 	uint16_t attr;
 	uint32_t clu;
 	uint64_t len;
+
+	struct tm mtime;
+	struct tm atime;
+	struct tm ctime;
+
+	struct inode *p_inode;
+
+	atomic_int refcount;
 };
 
 #define BOOTSEC_JUMPBOOT_LEN		3
@@ -56,6 +70,7 @@ struct inode {
 #define BOOTSEC_ZERO_LEN		53
 
 #define FILENAME_LEN			15
+#define MAX_NAME_LENGTH         255
 
 /* EXFAT: Main and Backup Boot Sector (512 bytes) */
 struct boot_sector {
