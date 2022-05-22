@@ -114,11 +114,9 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	initialize_super(&sb, argv[1]);
-	read_boot_sector(&sb);
-	read_fat_region(&sb);
+	fill_super(&sb, argv[1]);
 	parse_break_pattern(&sb, argv[2]);
-	finalize_super(&sb);
+	put_super(&sb);
 
 	return 0;
 }

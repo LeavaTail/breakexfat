@@ -12,62 +12,10 @@
 #include "endian.h"
 #include "list.h"
 
-/**
- * initialize_super - initialize super_block
- * @sb:               Filesystem metadata
- * @name:             Target exFAT filesystem image path
- *
- * @return            == 0 (success)
- *                    <  0 (failed)
- */
-int initialize_super(struct super_block *sb, const char *name)
-{
-	struct stat stat;
-
-	if (!sb)
-		return -EINVAL;
-
-	sb->sector_size = 512;
-
-	if ((sb->fd = open(name, O_RDWR)) < 0) {
-		pr_err("open: %s\n", strerror(errno));
-		return -errno;
-	}
-
-	if (fstat(sb->fd, &stat) < 0) {
-		pr_err("stat: %s\n", strerror(errno));
-		close(sb->fd);
-		return -errno;
-	}
-	sb->total_size = stat.st_size;
-
-	sb->inodes = NULL;
-	sb->sector_list = NULL;
-	sb->cluster_list = NULL;
-
-	return 0;
-}
-
-/**
- * finalize_super - finalize_super super_block
- * @sb:             Filesystem metadata
- *
- * @return          == 0 (success)
- *                  <  0 (failed)
- */
-int finalize_super(struct super_block *sb)
-{
-	if (!sb)
-		return -EINVAL;
-
-	remove_cache_list(sb, sb->sector_list);
-	remove_cache_list(sb, sb->cluster_list);
-
-	if (sb->fd)
-		close(sb->fd);
-
-	return 0;
-}
+static int read_boot_sector(struct super_block *sb);
+static int verify_boot_sector(struct super_block *sb, struct boot_sector *b);
+static int read_fat_region(struct super_block *sb);
+static struct inode *read_root_dir(struct super_block *sb);
 
 /**
  * read_boot_sector - read boot sector in exFAT
@@ -76,7 +24,7 @@ int finalize_super(struct super_block *sb)
  * @return            == 0 (success)
  *                    <  0 (failed)
  */
-int read_boot_sector(struct super_block *sb)
+static int read_boot_sector(struct super_block *sb)
 {
 	int ret = 0;
 	struct boot_sector *boot;
@@ -118,7 +66,7 @@ out:
  * @return              == 0 (success)
  *                      <  0 (failed)
  */
-int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
+static int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
 {
 	if ((b->jmp_boot[0] != 0xEB) ||
 		(b->jmp_boot[1] != 0x76) ||
@@ -149,7 +97,7 @@ int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
  * @return           == 0 (success)
  *                   <  0 (failed)
  */
-int read_fat_region(struct super_block *sb)
+static int read_fat_region(struct super_block *sb)
 {
 	size_t sectors = ROUNDUP(sb->fat_length, sb->sector_size);
 	struct cache *fat1, *fat2;
@@ -164,6 +112,82 @@ int read_fat_region(struct super_block *sb)
 	if ((fat2 = create_sector_cache(sb, sb->fat_offset + sb->fat_length, sectors)) == NULL)
 		return -EINVAL;
 	list_add_tail(sb->sector_list, fat2);
+
+	return 0;
+}
+
+/**
+ * fill_super - initialize super_block
+ * @sb:               Filesystem metadata
+ * @name:             Target exFAT filesystem image path
+ *
+ * @return            == 0 (success)
+ *                    <  0 (failed)
+ */
+int fill_super(struct super_block *sb, const char *name)
+{
+	int ret = 0;
+	struct stat stat;
+
+	if (!sb)
+		return -EINVAL;
+
+	sb->sector_size = 512;
+
+	if ((sb->fd = open(name, O_RDWR)) < 0) {
+		pr_err("open: %s\n", strerror(errno));
+		return -errno;
+	}
+
+	if (fstat(sb->fd, &stat) < 0) {
+		pr_err("stat: %s\n", strerror(errno));
+		ret = -errno;
+		goto err;
+	}
+	sb->total_size = stat.st_size;
+	sb->alloc_second = 0;
+
+	if (read_boot_sector(sb)) {
+		ret = -errno;
+		goto err;
+	}
+
+	if ((ret = read_fat_region(sb)) != 0) {
+		pr_err("Failed to load FAT\n");
+		goto err;
+	}
+
+	if ((sb->inodes = init_list_head(read_root_dir(sb))) == NULL) {
+		pr_err("Failed to load inodes\n");
+		goto err_put;
+	}
+
+	return 0;
+
+err_put:
+	remove_cache_list(sb, sb->sector_list);
+err:
+	close(sb->fd);
+	return ret;
+}
+
+/**
+ * put_super - put_super super_block
+ * @sb:        Filesystem metadata
+ *
+ * @return     == 0 (success)
+ *             <  0 (failed)
+ */
+int put_super(struct super_block *sb)
+{
+	if (!sb)
+		return -EINVAL;
+
+	remove_cache_list(sb, sb->sector_list);
+	remove_cache_list(sb, sb->cluster_list);
+
+	if (sb->fd)
+		close(sb->fd);
 
 	return 0;
 }
