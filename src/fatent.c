@@ -49,7 +49,7 @@ int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry)
 
 	offset += sb->fat_length * active_fat;
 
-	cache = search_cache(sb, sb->sector_list, offset);
+	cache = get_sector_cache(sb, offset);
 	fat = cache->data;
 
 	if (validate_cluster(sb, clu))  {
@@ -82,7 +82,7 @@ int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry)
 
 	offset += sb->fat_length * active_fat;
 
-	cache = search_cache(sb, sb->sector_list, offset);
+	cache = get_sector_cache(sb, offset);
 	fat = cache->data;
 
 	if (validate_cluster(sb, clu) || (validate_cluster(sb, entry))) {

@@ -123,7 +123,7 @@ err:
  * @return        != NULL (success)
  *                == NULL (failed)
  */
-struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index)
+static struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index)
 {
 	struct list_head *node;
 	struct cache *cache;
@@ -135,6 +135,54 @@ struct cache *search_cache(struct super_block *sb, struct list_head *head, uint3
 	}
 
 	return NULL;
+}
+
+/**
+ * get_cluster_cache - get cluster cache
+ * @sb:                Filesystem metadata
+ * @index:             Start bytes
+ *
+ * @return             != NULL (success)
+ *                     == NULL (failed)
+ */
+struct cache *get_cluster_cache(struct super_block *sb, uint32_t index)
+{
+	struct cache *cache;
+
+	if ((cache = search_cache(sb, sb->cluster_list, index)) != NULL)
+		return cache;
+
+	cache = create_cluster_cache(sb, index, 1);
+	if (!cache)
+		return NULL;
+
+	list_add(sb->cluster_list, cache);
+
+	return cache;
+}
+
+/**
+ * get_sector_cache - get sector cache
+ * @sb:               Filesystem metadata
+ * @index:            Start bytes
+ *
+ * @return            != NULL (success)
+ *                    == NULL (failed)
+ */
+struct cache *get_sector_cache(struct super_block *sb, uint32_t index)
+{
+	struct cache *cache;
+
+	if ((cache = search_cache(sb, sb->sector_list, index)) != NULL)
+		return cache;
+
+	cache = create_sector_cache(sb, index, 1);
+	if (!cache)
+		return NULL;
+
+	list_add(sb->sector_list, cache);
+
+	return cache;
 }
 
 /**

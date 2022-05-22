@@ -107,7 +107,8 @@ struct inode *read_root_directory(struct super_block *sb);
 
 struct cache *create_cluster_cache(struct super_block *sb, uint32_t index, size_t count);
 struct cache *create_sector_cache(struct super_block *sb, uint32_t index, size_t count);
-struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index);
+struct cache *get_cluster_cache(struct super_block *sb, uint32_t index);
+struct cache *get_sector_cache(struct super_block *sb, uint32_t index);
 int remove_cache(struct super_block *sb, struct list_head *prev);
 int remove_cache_list(struct super_block *sb, struct list_head *head);
 
