@@ -119,4 +119,9 @@ int update_active_fat(struct super_block *sb, int index);
 int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry);
 int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry);
 
+int update_active_bitmap(struct super_block *sb, int index);
+int set_alloc_bitmap(struct super_block *sb, uint32_t clu);
+int unset_alloc_bitmap(struct super_block *sb, uint32_t clu);
+int get_alloc_bitmap(struct super_block *sb, uint32_t clu);
+
 #endif /*_DEBUGFATFS_H */

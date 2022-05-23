@@ -36,6 +36,7 @@ struct super_block {
 	uint32_t heap_offset;
 	uint32_t root_offset;
 	uint32_t alloc_offset;
+	uint32_t alloc_second;
 	uint64_t alloc_length;
 	uint32_t upcase_offset;
 	uint32_t upcase_size;
