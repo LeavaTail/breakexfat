@@ -84,6 +84,8 @@ static inline uint64_t power2(uint32_t n)
 
 static inline int validate_cluster(struct super_block *sb, uint32_t clu)
 {
+	if (clu == EXFAT_LASTCLUSTER)
+		return 0;
 	if (clu < EXFAT_FIRST_CLUSTER)
 		return -EINVAL;
 	if (clu > sb->cluster_count + 1)
