@@ -96,3 +96,29 @@ int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry)
 
 	return 0;
 }
+
+/**
+ * get_next_cluster - Get next cluster in FAT chain
+ * @sb:               Filesystem metadata
+ * @inode:            target file/directory
+ * @clu:              index of the cluster want to check
+ * @entry:            FAT entry (Output)
+ *
+ * @return            next_cluster (success)
+ *                    == 0         (failed)
+ */
+int get_next_cluster(struct super_block *sb, struct inode *inode, uint32_t clu, uint32_t *entry)
+{
+	if (inode->flags & (1 << NoFatChain_bit))
+		*entry = clu + 1;
+	else
+		return get_fat_entry(sb, clu, entry);
+
+	if (validate_cluster(sb, *entry)) {
+		pr_err("Internal Error: Cluster %08x is invalid.\n", clu);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+

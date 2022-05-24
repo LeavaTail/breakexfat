@@ -53,6 +53,7 @@ struct super_block {
 struct inode {
 	char *name;
 	uint8_t name_len;
+	uint8_t flags;
 	uint16_t attr;
 	uint32_t clu;
 	uint64_t len;
@@ -64,6 +65,11 @@ struct inode {
 	struct inode *p_inode;
 
 	atomic_int refcount;
+};
+
+enum {
+	AllocationPossible_bit,
+	NoFatChain_bit,
 };
 
 #define BOOTSEC_JUMPBOOT_LEN		3

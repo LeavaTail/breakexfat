@@ -120,6 +120,7 @@ int disable_break_pattern(struct super_block *sb, unsigned int index);
 int update_active_fat(struct super_block *sb, int index);
 int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry);
 int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry);
+int get_next_cluster(struct super_block *sb, struct inode *inode, uint32_t clu, uint32_t *entry);
 
 int update_active_bitmap(struct super_block *sb, int index);
 int set_alloc_bitmap(struct super_block *sb, uint32_t clu);
