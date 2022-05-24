@@ -23,9 +23,12 @@
  */
 int get_sector(struct super_block *sb, void *data, off_t index, size_t count)
 {
-	pr_debug("Get: Sector from 0x%lx to 0x%lx\n", index, index + (count * sb->sector_size) - 1);
+	off_t offset = index * sb->sector_size;
 
-	if ((pread(sb->fd, data, sb->sector_size * count, index)) < 0) {
+	pr_debug("Get: Sector from 0x%lx to 0x%lx\n",
+			offset, offset + (count * sb->sector_size) - 1);
+
+	if ((pread(sb->fd, data, sb->sector_size * count, offset)) < 0) {
 		pr_err("read: %s\n", strerror(errno));
 		return -errno;
 	}
@@ -47,9 +50,12 @@ int get_sector(struct super_block *sb, void *data, off_t index, size_t count)
  */
 int set_sector(struct super_block *sb, void *data, off_t index, size_t count)
 {
-	pr_debug("Set: Sector from 0x%lx to 0x%lx\n", index, index + (count * sb->sector_size) - 1);
+	off_t offset = index * sb->sector_size;
 
-	if ((pwrite(sb->fd, data, sb->sector_size * count, index)) < 0) {
+	pr_debug("Set: Sector from 0x%lx to 0x%lx\n",
+			offset, offset + (count * sb->sector_size) - 1);
+
+	if ((pwrite(sb->fd, data, sb->sector_size * count, offset)) < 0) {
 		pr_err("write: %s\n", strerror(errno));
 		return -errno;
 	}
