@@ -99,17 +99,16 @@ static int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
  */
 static int read_fat_region(struct super_block *sb)
 {
-	size_t sectors = ROUNDUP(sb->fat_length, sb->sector_size);
 	struct cache *fat1, *fat2;
 
-	if ((fat1 = create_sector_cache(sb, sb->fat_offset, sectors)) == NULL)
+	if ((fat1 = create_sector_cache(sb, sb->fat_offset, sb->fat_length)) == NULL)
 		return -EINVAL;
 	list_add_tail(sb->sector_list, fat1);
 
 	if (sb->num_fats == 1)
 		return 0;
 
-	if ((fat2 = create_sector_cache(sb, sb->fat_offset + sb->fat_length, sectors)) == NULL)
+	if ((fat2 = create_sector_cache(sb, sb->fat_offset + sb->fat_length, sb->fat_length)) == NULL)
 		return -EINVAL;
 	list_add_tail(sb->sector_list, fat2);
 
