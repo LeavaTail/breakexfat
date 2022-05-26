@@ -71,6 +71,7 @@ struct cache {
 #define MAX(a, b)      ((a) > (b) ? (a) : (b))
 #define MIN(a, b)      ((a) < (b) ? (a) : (b))
 #define ROUNDUP(a, b)  ((a + b - 1) / b)
+#define BIT(N)         (1UL << (N))
 
 static inline bool is_power2(unsigned int n)
 {

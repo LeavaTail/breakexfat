@@ -109,7 +109,7 @@ int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry)
  */
 int get_next_cluster(struct super_block *sb, struct inode *inode, uint32_t clu, uint32_t *entry)
 {
-	if (inode->flags & (1 << NoFatChain_bit))
+	if (inode->flags & NOFATCHAIN)
 		*entry = clu + 1;
 	else
 		return get_fat_entry(sb, clu, entry);

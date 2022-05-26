@@ -67,10 +67,9 @@ struct inode {
 	atomic_int refcount;
 };
 
-enum {
-	AllocationPossible_bit,
-	NoFatChain_bit,
-};
+#define ALLOC_POSSIBLE BIT(0)
+#define NOFATCHAIN     BIT(1)
+
 
 #define BOOTSEC_JUMPBOOT_LEN		3
 #define BOOTSEC_FSNAME_LEN		8
