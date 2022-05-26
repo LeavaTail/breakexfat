@@ -105,7 +105,7 @@ int print_cluster(struct super_block *sb, off_t index, size_t count);
 int fill_super(struct super_block *sb, const char *name);
 int put_super(struct super_block *sb);
 struct inode *alloc_inode(struct super_block *sb);
-struct inode *read_root_directory(struct super_block *sb);
+int free_inode(struct inode *inode);
 
 struct cache *create_cluster_cache(struct super_block *sb, uint32_t index, size_t count);
 struct cache *create_sector_cache(struct super_block *sb, uint32_t index, size_t count);

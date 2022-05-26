@@ -51,8 +51,6 @@ static int read_boot_sector(struct super_block *sb)
 	sb->root_offset = le32_to_cpu(boot->root_cluster);
 
 	sb->sector_list = init_list_head(create_sector_cache(sb, 0, 1));
-	sb->cluster_list = init_list_head(create_cluster_cache(sb, sb->root_offset, 1));
-	sb->inodes = init_list_head(read_root_directory(sb));
 out:
 	free(boot);
 
@@ -116,6 +114,46 @@ static int read_fat_region(struct super_block *sb)
 }
 
 /**
+ * read_root_dir - read boot sector in exFAT
+ * @sb:            Filesystem metadata
+ *
+ * @return         == 0 (success)
+ *                 <  0 (failed)
+ */
+static struct inode *read_root_dir(struct super_block *sb)
+{
+	struct inode *root;
+	uint32_t clu, next;
+
+	root = alloc_inode(sb);
+	if (!root) {
+		pr_warn("Failed to allocate inode.\n");
+		return NULL;
+	}
+
+	strncpy(root->name, "/", strlen("/") + 1);
+	root->name_len = 1;
+	root->clu = sb->root_offset;
+	root->flags = 0;
+
+	clu = sb->root_offset;
+
+	do {
+		sb->cluster_list = init_list_head(create_cluster_cache(sb, sb->root_offset, 1));
+		if (get_next_cluster(sb, root, clu, &next))
+			goto err;
+		clu = next;
+
+	} while (clu != EXFAT_LASTCLUSTER);
+
+	return root;
+
+err:
+	free_inode(root);
+	return NULL;
+}
+
+/**
  * fill_super - initialize super_block
  * @sb:               Filesystem metadata
  * @name:             Target exFAT filesystem image path
@@ -127,6 +165,7 @@ int fill_super(struct super_block *sb, const char *name)
 {
 	int ret = 0;
 	struct stat stat;
+	struct inode *root;
 
 	if (!sb)
 		return -EINVAL;
@@ -156,10 +195,12 @@ int fill_super(struct super_block *sb, const char *name)
 		goto err;
 	}
 
-	if ((sb->inodes = init_list_head(read_root_dir(sb))) == NULL) {
+	if ((root = read_root_dir(sb)) == NULL) {
 		pr_err("Failed to load inodes\n");
 		goto err_put;
 	}
+
+	sb->inodes = init_list_head(root);
 
 	return 0;
 
@@ -218,26 +259,21 @@ struct inode *alloc_inode(struct super_block *sb)
 }
 
 /**
- * read_root_directory - read boot sector in exFAT
- * @sb:                  Filesystem metadata
+ * free_inode - release inode
+ * @inode:      file/directory
  *
- * @return               == 0 (success)
- *                       <  0 (failed)
+ * @return      == 0 (success)
+ *              <  0 (failed)
  */
-struct inode *read_root_directory(struct super_block *sb)
+int free_inode(struct inode *inode)
 {
-	struct inode *root;
-
-	root = alloc_inode(sb);
-	if (!root) {
-		pr_warn("Failed to allocate inode.\n");
-		return NULL;
+	if (inode->refcount) {
+		pr_warn("other inodes are used by this inode(%p)\n", inode);
+		return -EINVAL;
 	}
 
-	strncpy(root->name, "/", strlen("/") + 1);
-	root->name_len = 1;
-	root->clu = sb->root_offset;
+	free(inode->name);
+	free(inode);
 
-	return root;
+	return 0;
 }
-
