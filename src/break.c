@@ -7,7 +7,7 @@
 #include "breakexfat.h"
 
 /**
- * break exFAT image
+ * break exFAT image information
  */
 struct break_pattern_information {
 	char *name;
@@ -21,7 +21,7 @@ static int break_boot_fsname(struct super_block *sb, struct cache *cache, int ty
 static int break_boot_zero(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_partoff(struct super_block *sb, struct cache *cache, int type);
 
-/* Array for break pattern */
+//! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
 {
 	{"Invalid JumpBoot", false, 0, break_boot_jumpboot},
@@ -31,12 +31,12 @@ static struct break_pattern_information break_boot_info[] =
 };
 
 /**
- * enable_break_pattern - Enable break pattern
- * @sb:                   Filesystem metadata
- * @index:                index of break_info
+ * @brief Enable break pattern
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index index of break_info
  *
- * @return                == 0 (success)
- *                        <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int enable_break_pattern(struct super_block *sb, unsigned int index)
 {
@@ -49,12 +49,12 @@ int enable_break_pattern(struct super_block *sb, unsigned int index)
 }
 
 /**
- * disable_break_pattern - Disable break pattern
- * @sb:                    Filesystem metadata
- * @index:                 index of break_info
+ * @brief Disable break pattern
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index index of break_info
  *
- * @return                 == 0 (success)
- *                         <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int disable_break_pattern(struct super_block *sb, unsigned int index)
 {
@@ -65,14 +65,15 @@ int disable_break_pattern(struct super_block *sb, unsigned int index)
 
 	return 0;
 }
+
 /**
- * break_boot_jumpboot - break jumoboot in boot sector
- * @sb:                  Filesystem metadata
- * @cache:               boot sector cache
- * @type:                break pattern
+ * @brief break jumoboot in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
  *
- * @return               == 0 (success)
- *                       <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int break_boot_jumpboot(struct super_block *sb, struct cache *cache, int type)
 {
@@ -87,13 +88,13 @@ static int break_boot_jumpboot(struct super_block *sb, struct cache *cache, int 
 }
 
 /**
- * break_boot_fsname - break FileSystemName in boot sector
- * @sb:                Filesystem metadata
- * @cache:             boot sector cache
- * @type:              break pattern
+ * @bried break FileSystemName in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
  *
- * @return             == 0 (success)
- *                     <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int break_boot_fsname(struct super_block *sb, struct cache *cache, int type)
 {
@@ -107,13 +108,13 @@ static int break_boot_fsname(struct super_block *sb, struct cache *cache, int ty
 }
 
 /**
- * break_boot_zero - break MustBeZero in boot sector
- * @sb:              Filesystem metadata
- * @cache:           boot sector cache
- * @type:            break pattern
+ * @brief break MustBeZero in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
  *
- * @return           == 0 (success)
- *                   <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int break_boot_zero(struct super_block *sb, struct cache *cache, int type)
 {
@@ -129,13 +130,13 @@ static int break_boot_zero(struct super_block *sb, struct cache *cache, int type
 }
 
 /**
- * break_boot_partoff - break PartitionOffset in boot sector
- * @sb:                 Filesystem metadata
- * @cache:              boot sector cache
- * @type:               break pattern
+ * @brief break PartitionOffset in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
  *
- * @return              == 0 (success)
- *                      <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int break_boot_partoff(struct super_block *sb, struct cache *cache, int type)
 {

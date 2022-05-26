@@ -18,11 +18,11 @@ static int read_fat_region(struct super_block *sb);
 static struct inode *read_root_dir(struct super_block *sb);
 
 /**
- * read_boot_sector - read boot sector in exFAT
- * @sb:               Filesystem metadata
+ * @brief Read boot sector in exFAT
+ * @param [in] sb Filesystem metadata
  *
- * @return            == 0 (success)
- *                    <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int read_boot_sector(struct super_block *sb)
 {
@@ -58,11 +58,12 @@ out:
 }
 
 /**
- * verify_boot_sector - verify boot sector
- * @sb:                 Filesystem metadata
+ * @brief Verify boot sector in exFAT
+ * @param [in] sb Filesystem metadata
+ * @param [in] b  boot sector
  *
- * @return              == 0 (success)
- *                      <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
 {
@@ -89,11 +90,11 @@ static int verify_boot_sector(struct super_block *sb, struct boot_sector *b)
 }
 
 /**
- * read_fat_region - read boot sector in exFAT
- * @sb:              Filesystem metadata
+ * @brief Read FAT region
+ * @param [in] sb Filesystem metadata
  *
- * @return           == 0 (success)
- *                   <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int read_fat_region(struct super_block *sb)
 {
@@ -114,11 +115,11 @@ static int read_fat_region(struct super_block *sb)
 }
 
 /**
- * read_root_dir - read boot sector in exFAT
- * @sb:            Filesystem metadata
+ * @brief Read root directory
+ * @param [in] sb Filesystem metadata
  *
- * @return         == 0 (success)
- *                 <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static struct inode *read_root_dir(struct super_block *sb)
 {
@@ -154,12 +155,12 @@ err:
 }
 
 /**
- * fill_super - initialize super_block
- * @sb:               Filesystem metadata
- * @name:             Target exFAT filesystem image path
+ * @brief Initialize super block
+ * @param [out] sb   Filesystem metadata
+ * @param [in]  name Target exFAT filesystem path
  *
- * @return            == 0 (success)
- *                    <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int fill_super(struct super_block *sb, const char *name)
 {
@@ -212,11 +213,11 @@ err:
 }
 
 /**
- * put_super - put_super super_block
- * @sb:        Filesystem metadata
+ * @brief put_super super_block
+ * @param [in] sb Filesystem metadata
  *
- * @return     == 0 (success)
- *             <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int put_super(struct super_block *sb)
 {
@@ -233,11 +234,10 @@ int put_super(struct super_block *sb)
 }
 
 /**
- * alloc_inode - allocate inode
- * @sb:          Filesystem metadata
+ * @brief allocate inode
+ * @param [in] sb Filesystem metadata
  *
- * @return       == 0 (success)
- *               <  0 (failed)
+ * @return allocated inode (or NULL)
  */
 struct inode *alloc_inode(struct super_block *sb)
 {
@@ -259,11 +259,11 @@ struct inode *alloc_inode(struct super_block *sb)
 }
 
 /**
- * free_inode - release inode
- * @inode:      file/directory
+ * @brief release inode
+ * @param [in] inode file/directory
  *
- * @return      == 0 (success)
- *              <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int free_inode(struct inode *inode)
 {

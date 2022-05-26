@@ -7,15 +7,17 @@
 #include "endian.h"
 #include <limits.h>
 
+/**
+ * Active Allocation Bitmap(1st or 2nd)
+ */
 static int active_bitmap = 0;
 
 /**
- * update_activate_bitmap - Update active Bitmap
- * @sb:                     Filesystem metadata
- * @index:                  The number of Bitmap
+ * @brief Update active Bitmap
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index The number of Bitmap
  *
- * @return                  == 0 (success)
- *                          <  0 (failed)
+ * @return success or failed
  */
 int update_active_bitmap(struct super_block *sb, int index)
 {
@@ -32,13 +34,13 @@ int update_active_bitmap(struct super_block *sb, int index)
 }
 
 /**
- * update_alloc_bitmap - Update bitmap entry
- * @sb:                  Filesystem metadata
- * @clu:                 index of the cluster want to check
- * @set:                 0 or 1
+ * @brief Update bitmap entry
+ * @param [in] sb  Filesystem metadata
+ * @param [in] clu index of the cluster want to check
+ * @param [in] set set bitmap 0 or unset bitmap 1
  *
- * @return               == 0 (success)
- *                       <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 static int update_alloc_bitmap(struct super_block *sb, uint32_t clu, bool set)
 {
@@ -73,12 +75,12 @@ static int update_alloc_bitmap(struct super_block *sb, uint32_t clu, bool set)
 }
 
 /**
- * set_alloc_bitmap - Set bitmap entry
- * @sb:               Filesystem metadata
- * @clu:              index of the cluster want to check
+ * @brief Set bitmap entry
+ * @param [in] sb  Filesystem metadata
+ * @param [in] clu index of the cluster want to check
  *
- * @return            == 0 (success)
- *                    <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int set_alloc_bitmap(struct super_block *sb, uint32_t clu)
 {
@@ -86,12 +88,12 @@ int set_alloc_bitmap(struct super_block *sb, uint32_t clu)
 }
 
 /**
- * unset_alloc_bitmap - Unset bitmap entry
- * @sb:                 Filesystem metadata
- * @clu:                index of the cluster want to check
+ * @brief Unset bitmap entry
+ * @param [in] sb  Filesystem metadata
+ * @param [in] clu index of the cluster want to check
  *
- * @return              == 0 (success)
- *                      <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int unset_alloc_bitmap(struct super_block *sb, uint32_t clu)
 {
@@ -99,12 +101,12 @@ int unset_alloc_bitmap(struct super_block *sb, uint32_t clu)
 }
 
 /**
- * get_alloc_bitmap - Update bitmap entry
- * @sb:               Filesystem metadata
- * @clu:              index of the cluster want to check
+ * @brief Update bitmap entry
+ * @param [in] sb   Filesystem metadata
+ * @param [in] clu  index of the cluster want to check
  *
- * @return            == 0 (success)
- *                    <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int get_alloc_bitmap(struct super_block *sb, uint32_t clu)
 {

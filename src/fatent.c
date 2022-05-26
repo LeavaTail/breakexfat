@@ -6,15 +6,17 @@
 #include "breakexfat.h"
 #include "endian.h"
 
+/**
+ * Active FAT(1st or 2nd)
+ */
 static int active_fat = 0;
 
 /**
- * update_activate_fat - Update active FAT
- * @sb:                  Filesystem metadata
- * @index:               The number of FATs
+ * @brief Update active FAT
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index The number of FATs
  *
- * @return               == 0 (success)
- *                       <  0 (failed)
+ * @return success or failed
  */
 int update_active_fat(struct super_block *sb, int index)
 {
@@ -31,13 +33,13 @@ int update_active_fat(struct super_block *sb, int index)
 }
 
 /**
- * get_fat_entry - Get FAT entry
- * @sb:            Filesystem metadata
- * @clu:           index of the cluster want to check
- * @entry:         any cluster index (Output)
+ * @brief  Get FAT entry
+ * @param [in]  sb    Filesystem metadata
+ * @param [in]  clu   index of the cluster want to check
+ * @param [out] entry FAT entry
  *
- * @return         == 0 (success)
- *                 <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry)
 {
@@ -64,13 +66,13 @@ int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry)
 }
 
 /**
- * set_fat_entry - Update FAT Entry
- * @sb:            Filesystem metadata
- * @clu:           index of the cluster want to check
- * @entry:         any cluster index
+ * @brief Update FAT Entry
+ * @param [in] sb     Filesystem metadata
+ * @param [in] clu    index of the cluster want to check
+ * @param [out] entry set bitmap 0 or unset bitmap 1
  *
- * @return         == 0 (success)
- *                 <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry)
 {
@@ -98,14 +100,14 @@ int set_fat_entry(struct super_block *sb, uint32_t clu, uint32_t entry)
 }
 
 /**
- * get_next_cluster - Get next cluster in FAT chain
- * @sb:               Filesystem metadata
- * @inode:            target file/directory
- * @clu:              index of the cluster want to check
- * @entry:            FAT entry (Output)
+ * @brief  Get next cluster in FAT chain
+ * @param [in]  sb     Filesystem metadata
+ * @param [in]  inode  target file/directory
+ * @param [in]  clu    index of the cluster want to check
+ * @param [out] entry FAT entry
  *
- * @return            next_cluster (success)
- *                    == 0         (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int get_next_cluster(struct super_block *sb, struct inode *inode, uint32_t clu, uint32_t *entry)
 {

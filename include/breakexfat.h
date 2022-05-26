@@ -17,25 +17,30 @@
 #include "exfat.h"
 #include "list.h"
 
-/**
- * Program Name, version, author.
- * displayed when 'usage' and 'version'
- */
+/* displayed when 'usage' and 'version' */
 #define PROGRAM_NAME     "breakexfat"
 #define PROGRAM_VERSION  "0.1.0"
 #define PROGRAM_AUTHOR   "LeavaTail"
 #define COPYRIGHT_YEAR   "2022"
 
 /**
- * Debug code
+ * print level variable
  */
 extern unsigned int print_level;
 
-#define PRINT_ERR      1
-#define PRINT_WARNING  2
-#define PRINT_INFO     3
-#define PRINT_DEBUG    4
+/**
+ * print level
+ */
+enum {
+	PRINT_ERR,      //!< error message level
+	PRINT_WARNING,  //!< warning message level
+	PRINT_INFO,     //!< information message level
+	PRINT_DEBUG,    //!< debug message level
+};
 
+/**
+ * standard print message function for breakexfat
+ */
 #define print(level, fmt, ...) \
 	do { \
 		if (print_level >= level) { \
@@ -47,42 +52,63 @@ extern unsigned int print_level;
 		} \
 	} while (0) \
 
-#define pr_err(fmt, ...)   print(PRINT_ERR, fmt, ##__VA_ARGS__)
-#define pr_warn(fmt, ...)  print(PRINT_WARNING, fmt, ##__VA_ARGS__)
-#define pr_info(fmt, ...)  print(PRINT_INFO, fmt, ##__VA_ARGS__)
-#define pr_debug(fmt, ...) print(PRINT_DEBUG, fmt, ##__VA_ARGS__)
-#define pr_msg(fmt, ...)   fprintf(stdout, fmt, ##__VA_ARGS__)
+#define pr_err(fmt, ...)   print(PRINT_ERR, fmt, ##__VA_ARGS__)      //!< error message
+#define pr_warn(fmt, ...)  print(PRINT_WARNING, fmt, ##__VA_ARGS__)  //!< warning message
+#define pr_info(fmt, ...)  print(PRINT_INFO, fmt, ##__VA_ARGS__)     //!< information message
+#define pr_debug(fmt, ...) print(PRINT_DEBUG, fmt, ##__VA_ARGS__)    //!< debug message
+#define pr_msg(fmt, ...)   fprintf(stdout, fmt, ##__VA_ARGS__)       //!< normal message
 
 /**
  * Cached data (sector/cluster)
  */
 struct cache {
-	struct super_block *sb;
-	void *data;
-	off_t offset;
-	size_t count;
-	bool dirty;
-	int (*read)(struct super_block *, void *, off_t, size_t);
-	int (*write)(struct super_block *, void *, off_t, size_t);
-	int (*print)(struct super_block *, off_t, size_t);
-	struct list_head *next;
+	struct super_block *sb;  //!< super block cache
+	void *data;              //!< cached sector/cluster
+	off_t offset;            //!< sector/cluster offset
+	size_t count;            //!< the number of cached data
+	bool dirty;              //!< whether cache is modified from storage
+	int (*read)(struct super_block *, void *, off_t, size_t);  //!< read operator
+	int (*write)(struct super_block *, void *, off_t, size_t); //!< write operator
+	int (*print)(struct super_block *, off_t, size_t);         //!< print operator
+	struct list_head *next;  //!< next cache
 };
 
-#define MAX(a, b)      ((a) > (b) ? (a) : (b))
-#define MIN(a, b)      ((a) < (b) ? (a) : (b))
-#define ROUNDUP(a, b)  ((a + b - 1) / b)
-#define BIT(N)         (1UL << (N))
+#define MAX(a, b)      ((a) > (b) ? (a) : (b))  //!< compare and return max value
+#define MIN(a, b)      ((a) < (b) ? (a) : (b))  //!< compare and return min value
+#define ROUNDUP(a, b)  ((a + b - 1) / b)        //!< Calulate division round up
+#define BIT(N)         (1UL << (N))             //!< bitwise operation
 
+/**
+ * @brief check if it's power of 2
+ * @param [in] n target value
+ *
+ * @retval 1 power of 2
+ * @retval 0 not power of 2
+ */
 static inline bool is_power2(unsigned int n)
 {
 	return (n != 0 && ((n & (n - 1)) == 0));
 }
 
+/**
+ * @brief eveluate power of 2
+ * @param [in] n target value
+ *
+ * @return  power of 2
+ */
 static inline uint64_t power2(uint32_t n)
 {
 	return 1 << n;
 }
 
+/**
+ * @brief check if @clu is valid cluster
+ * @param [in] sb  Filesystem metadata
+ * @param [in] clu target cluster index
+ *
+ * @retval 0 valid cluster
+ * @retval Negative in valid cluster
+ */
 static inline int validate_cluster(struct super_block *sb, uint32_t clu)
 {
 	if (clu == EXFAT_LASTCLUSTER)

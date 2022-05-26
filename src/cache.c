@@ -7,13 +7,12 @@
 #include "list.h"
 
 /**
- * create_cache - create cache
- * @sb:           Filesystem metadata
- * @index:        Start bytes
- * @count:        The number of sectors
+ * @brief create cache
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start index
+ * @param [in] count The number of sectors
  *
- * @return       != NULL (success)
- *               == NULL (failed)
+ * @return created cache (or NULL)
  */
 static struct cache *create_cache(struct super_block *sb, uint32_t index, size_t count)
 {
@@ -37,13 +36,12 @@ static struct cache *create_cache(struct super_block *sb, uint32_t index, size_t
 }
 
 /**
- * create_cluster_cache - create cache for cluster
- * @sb:                   Filesystem metadata
- * @index:                Start bytes
- * @count:                The number of sectors
+ * @brief create cache for cluster
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start cluster index
+ * @param [in] count The number of cluster
  *
- * @return                != NULL (success)
- *                        == NULL (failed)
+ * @return created cache (or NULL)
  */
 struct cache *create_cluster_cache(struct super_block *sb, uint32_t index, size_t count)
 {
@@ -76,13 +74,12 @@ err:
 }
 
 /**
- * create_sector_cache - create cache for sector
- * @sb:                  Filesystem metadata
- * @index:               Start bytes
- * @count:               The number of sectors
+ * @brief create cache for sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start sector index
+ * @param [in] count The number of sectors
  *
- * @return               != NULL (success)
- *                       == NULL (failed)
+ * @return created cache (or NULL)
  */
 struct cache *create_sector_cache(struct super_block *sb, uint32_t index, size_t count)
 {
@@ -115,13 +112,12 @@ err:
 }
 
 /**
- * search_cache - search cache from list
- * @sb:           Filesystem metadata
- * @index:        Start bytes
- * @list:         Searched list
+ * @brief Search cache from list
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start sector index
+ * @param [in] list  Searched list
  *
- * @return        != NULL (success)
- *                == NULL (failed)
+ * @return target cache (or NULL)
  */
 static struct cache *search_cache(struct super_block *sb, struct list_head *head, uint32_t index)
 {
@@ -138,12 +134,11 @@ static struct cache *search_cache(struct super_block *sb, struct list_head *head
 }
 
 /**
- * get_cluster_cache - get cluster cache
- * @sb:                Filesystem metadata
- * @index:             Start bytes
+ * @brief Get cluster cache
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start sector index
  *
- * @return             != NULL (success)
- *                     == NULL (failed)
+ * @return target cache (or NULL)
  */
 struct cache *get_cluster_cache(struct super_block *sb, uint32_t index)
 {
@@ -162,12 +157,11 @@ struct cache *get_cluster_cache(struct super_block *sb, uint32_t index)
 }
 
 /**
- * get_sector_cache - get sector cache
- * @sb:               Filesystem metadata
- * @index:            Start bytes
+ * @brief Get sector cache
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start cluster index
  *
- * @return            != NULL (success)
- *                    == NULL (failed)
+ * @return target cache (or NULL)
  */
 struct cache *get_sector_cache(struct super_block *sb, uint32_t index)
 {
@@ -186,11 +180,11 @@ struct cache *get_sector_cache(struct super_block *sb, uint32_t index)
 }
 
 /**
- * remove_cache - remove node from list
- * @sb:           Filesystem metadata
- * @prev:         removed previous node
+ * @brief remove node from list
+ * @param [in] sb    Filesystem metadata
+ * @param [in] prev  removed previous node
  *
- * @return        == 0 (success)
+ * @return success or failed
  */
 int remove_cache(struct super_block *sb, struct list_head *prev)
 {
@@ -216,11 +210,11 @@ int remove_cache(struct super_block *sb, struct list_head *prev)
 }
 
 /**
- * remove_cache_list - remove list
- * @sb:                Filesystem metadata
- * @head:              removed head of list
+ * @brief remove list
+ * @param [in] sb    Filesystem metadata
+ * @param [in] head  removed head of list
  *
- * @return             == 0 (success)
+ * @return success or failed
  */
 int remove_cache_list(struct super_block *sb, struct list_head *head)
 {

@@ -8,8 +8,14 @@
 #include "breakexfat.h"
 #include "list.h"
 
+/**
+ * breakexfat needs 2 parameter
+ */
 #define MANDATORY_ARGUMENT 2
 
+/**
+ * print level
+ */
 unsigned int print_level = PRINT_WARNING;
 
 /**
@@ -21,14 +27,16 @@ enum
 	GETOPT_VERSION_CHAR = (CHAR_MIN - 3)
 };
 
-/* option data {"long name", needs argument, flags, "short name"} */
+/**
+ * option data {"long name", needs argument, flags, "short name"}
+ */
 static struct option const longopts[] =
 {
 	{0,0,0,0}
 };
 
 /**
- * usage - print out usage
+ * @brief print out usage
  */
 static void usage(void)
 {
@@ -38,10 +46,10 @@ static void usage(void)
 }
 
 /**
- * version        - print out program version
- * @command_name:   command name
- * @version:        program version
- * @author:         program authoer
+ * @brief print out program version
+ * @param [in] command_name command name
+ * @param [in] version      program version
+ * @param [in] author       program authoer
  */
 static void version(const char *command_name, const char *version, const char *author)
 {
@@ -51,12 +59,12 @@ static void version(const char *command_name, const char *version, const char *a
 }
 
 /**
- * parse_break_pattern - Parse cmdline argument
- * @sb:                  Filesystem metadata
- * @line:                 cmdline argument
+ * @brief Parse cmdline argument
+ * @param [in] sb   Filesystem metadata
+ * @param [in] line cmdline argument
  *
- * @return               == 0 (success)
- *                       <  0 (failed)
+ * @retval 0 success
+ * @retval Negative failed
  */
 int parse_break_pattern(struct super_block *sb, char *line)
 {
@@ -79,9 +87,9 @@ int parse_break_pattern(struct super_block *sb, char *line)
 }
 
 /**
- * main   - main function
- * @argc:   argument count
- * @argv:   argument vector
+ * @brief main function
+ * @param [in] argc argument count
+ * @param [in] argv argument vector
  */
 int main(int argc, char *argv[])
 {

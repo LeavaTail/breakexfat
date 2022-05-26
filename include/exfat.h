@@ -14,71 +14,76 @@
 
 #include "list.h"
 
-#define EXFAT_FIRST_CLUSTER  2
-#define EXFAT_BADCLUSTER     0xFFFFFFF7
-#define EXFAT_LASTCLUSTER    0xFFFFFFFF
+#define EXFAT_FIRST_CLUSTER  2           //!< Cluster will be started from 2
+#define EXFAT_BADCLUSTER     0xFFFFFFF7  //!< FATentry's corresponding cluster as "bad"
+#define EXFAT_LASTCLUSTER    0xFFFFFFFF  //!< cluster as the last cluster of a cluster chain
 
-/*
- * exFAT filesystem superblock
+/**
+ * information about the enclosing target exFAT filesystem
  */
 struct super_block {
-	int fd;
-	off_t total_size;
+	int fd;                 //!< opened file for exFAT filesystem image
+	off_t total_size;       //!< volume size
 
-	uint64_t part_offset;
-	uint32_t vol_size;
-	uint16_t sector_size;
-	uint32_t cluster_size;
-	uint32_t cluster_count;
-	uint32_t fat_offset;
-	uint32_t fat_length;
-	uint8_t num_fats;
-	uint32_t heap_offset;
-	uint32_t root_offset;
-	uint32_t alloc_offset;
-	uint32_t alloc_second;
-	uint64_t alloc_length;
-	uint32_t upcase_offset;
-	uint32_t upcase_size;
+	/* Derived from Boot sector */
+	uint64_t part_offset;   //!< media-relative sector offset of the partition
+	uint32_t vol_size;      //!< size of the given exFAT volume in sectors
+	uint16_t sector_size;   //!< bytes per sector
+	uint32_t cluster_size;  //!< bytes per cluster
+	uint32_t cluster_count; //!< the number of clusters the Cluster Heap
+	uint32_t fat_offset;    //!< volume-relative sector offset of the First FAT
+	uint32_t fat_length;    //!< length in sectors of each FAT table
+	uint8_t num_fats;       //!< the number of FATs and Allocation Bitmaps
+	uint32_t heap_offset;   //!< volume-relative sector offset of the Cluster Heap
+	uint32_t root_offset;   //!< cluster index of the first cluster of the root directory
+	uint32_t alloc_offset;  //!< cluster index of the first cluster of the 1st Allocation Bitmap
+	uint32_t alloc_second;  //!< cluster index of the first cluster of the 2nd Allocation Bitmap
+	uint64_t alloc_length;  //!< length of Allocation Bitmap
+	uint32_t upcase_offset; //!< cluster index of the first cluster of the Up-case table
+	uint32_t upcase_size;   //!< length of Up-case table
 
-	struct list_head *inodes;
+	/* cached list */
+	struct list_head *inodes;       //!< cached inode
 
-	struct list_head *sector_list;
-	struct list_head *cluster_list;
+	struct list_head *sector_list;  //!< cached sector
+	struct list_head *cluster_list; //!< cached cluster
 };
 
-/*
- * exFAT filesystem inode
+/**
+ * metadata pertaining to the file/directory
  */
 struct inode {
-	char *name;
-	uint8_t name_len;
-	uint8_t flags;
-	uint16_t attr;
-	uint32_t clu;
-	uint64_t len;
+	char *name;       //!< File/Directory name
+	uint8_t name_len; //!< Name length
+	uint8_t flags;    //!< GeneralSecondaryFlags in Stream dentry
+	uint16_t attr;    //!< FileAttributes in File dentry
+	uint32_t clu;     //!< FirstCluster in Stream dentry
+	uint64_t len;     //!< DataLength in Stream dentry
 
-	struct tm mtime;
-	struct tm atime;
-	struct tm ctime;
+	struct tm mtime;  //!< LastModified timestamp in File dentry
+	struct tm atime;  //!< LastAccessed timestamp in File dentry
+	struct tm ctime;  //!< LastCreate timestamp in File dentry
 
-	struct inode *p_inode;
+	struct inode *p_inode;  //!< Parent Directory inode
 
-	atomic_int refcount;
+	atomic_int refcount;    //!< reference count for inode
 };
 
-#define ALLOC_POSSIBLE BIT(0)
-#define NOFATCHAIN     BIT(1)
+/* For GeneralPrimaryFlags Field */
+#define ALLOC_POSSIBLE BIT(0) //!< allocation in the Cluster Heap is possible
+#define NOFATCHAIN     BIT(1) //!< given allocation's cluster chain
 
+/* For Boot sector */
+#define BOOTSEC_JUMPBOOT_LEN  3  //!< length of JumpBoot
+#define BOOTSEC_FSNAME_LEN    8  //!< length of FileSystemName
+#define BOOTSEC_ZERO_LEN      53 //!< length of MustBeZero
 
-#define BOOTSEC_JUMPBOOT_LEN		3
-#define BOOTSEC_FSNAME_LEN		8
-#define BOOTSEC_ZERO_LEN		53
+#define FILENAME_LEN     15  //!< length of the maximum FileName in dentry
+#define MAX_NAME_LENGTH  255 //!< length of the maximum FileName
 
-#define FILENAME_LEN			15
-#define MAX_NAME_LENGTH         255
-
-/* EXFAT: Main and Backup Boot Sector (512 bytes) */
+/**
+ * boot-strapping from an exFAT volume (512 bytes)
+ */
 struct boot_sector {
 	__u8	jmp_boot[BOOTSEC_JUMPBOOT_LEN];
 	__u8	fs_name[BOOTSEC_FSNAME_LEN];
@@ -103,6 +108,9 @@ struct boot_sector {
 	__le16	signature;
 } __attribute__((packed));
 
+/**
+ * directory entry (32 bytes)
+ */
 struct exfat_dentry {
 	__u8 type;
 	union {

@@ -10,16 +10,17 @@
 #include "breakexfat.h"
 
 /**
- * get_sector - Get Raw-Data from any sector
- * @sb:         Filesystem metadata
- * @data:       Sector raw data (Output)
- * @index:      Start bytes
- * @count:      The number of sectors
+ * @brief Get Raw-Data from any sector
  *
- * @return       == 0 (success)
- *               <  0 (failed)
+ * @param [in]  sb    Filesystem metadata
+ * @param [out] data  Sector raw data
+ * @param [in]  index Start sector index
+ * @param [in]  count The number of sectors
  *
- * NOTE: Need to allocate @data before call it.
+ * @retval 0 success
+ * @retval Negative failed
+ *
+ * @attention Need to allocate @data before call it.
  */
 int get_sector(struct super_block *sb, void *data, off_t index, size_t count)
 {
@@ -37,16 +38,17 @@ int get_sector(struct super_block *sb, void *data, off_t index, size_t count)
 }
 
 /**
- * set_sector - Set Raw-Data from any sector
- * @sb:         Filesystem metadata
- * @data:       Sector raw data
- * @index:      Start bytes
- * @count:      The number of sectors
+ * @brief Set Raw-Data from any sector
  *
- * @return      == 0 (success)
- *              <  0 (failed)
+ * @param [in] sb    Filesystem metadata
+ * @param [in] data  Sector raw data
+ * @param [in] index Start sector index
+ * @param [in] count The number of sectors
  *
- * NOTE: Need to allocate @data before call it.
+ * @retval 0 success
+ * @retval Negative failed
+ *
+ * @attention  Need to allocate @data before call it.
  */
 int set_sector(struct super_block *sb, void *data, off_t index, size_t count)
 {
@@ -64,13 +66,14 @@ int set_sector(struct super_block *sb, void *data, off_t index, size_t count)
 }
 
 /**
- * print_sector -  Print Raw-Data from any sector
- * @sb:            Filesystem metadata
- * @index:         Start cluster index
- * @count:         The number of clusters
+ * @brief Print Raw-Data from any sector
  *
- * @return         == 0 (success)
- *                 <  0 (failed)
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start sector index
+ * @param [in] count The number of sectors
+ *
+ * @retval 0 success
+ * @retval Negative failed
  */
 int print_sector(struct super_block *sb, off_t index, size_t count)
 {
@@ -107,17 +110,19 @@ out:
 	
 	return ret;
 }
+
 /**
- * get_cluster -  Get Raw-Data from any cluster
- * @sb:           Filesystem metadata
- * @data:         cluster raw data (Output)
- * @index:        Start cluster index
- * @count:        The number of clusters
+ * @brief Get Raw-Data from any cluster
  *
- * @return        == 0 (success)
- *                <  0 (failed)
+ * @param [in]  sb    Filesystem metadata
+ * @param [out] data  Cluster raw data
+ * @param [in]  index Start cluster index
+ * @param [in]  count The number of clusters
  *
- * NOTE: Need to allocate @data before call it.
+ * @retval 0 success
+ * @retval Negative failed
+ *
+ * @attention Need to allocate @data before call it.
  */
 int get_cluster(struct super_block *sb, void *data, off_t index, size_t count)
 {
@@ -136,16 +141,17 @@ int get_cluster(struct super_block *sb, void *data, off_t index, size_t count)
 }
 
 /**
- * set_cluster -  Set Raw-Data from any cluster
- * @sb:           Filesystem metadata
- * @data:         cluster raw data
- * @index:        Start cluster index
- * @count:        The number of clusters
+ * @brief Set Raw-Data from any cluster
  *
- * @return        == 0 (success)
- *                <  0 (failed to read)
+ * @param [in] sb    Filesystem metadata
+ * @param [in] data  Cluster raw data
+ * @param [in] index Start cluster index
+ * @param [in] count The number of clusters
  *
- * NOTE: Need to allocate @data before call it.
+ * @retval 0 success
+ * @retval Negative failed
+ *
+ * @attention  Need to allocate @data before call it.
  */
 int set_cluster(struct super_block *sb, void *data, off_t index, size_t count)
 {
@@ -164,13 +170,14 @@ int set_cluster(struct super_block *sb, void *data, off_t index, size_t count)
 }
 
 /**
- * print_cluster -  Print Raw-Data from any cluster
- * @sb:             Filesystem metadata
- * @index:          Start cluster index
- * @count:          The number of clusters
+ * @brief Print Raw-Data from any cluster
  *
- * @return          == 0 (success)
- *                  <  0 (failed)
+ * @param [in] sb    Filesystem metadata
+ * @param [in] index Start cluster index
+ * @param [in] count The number of clusters
+ *
+ * @retval 0 success
+ * @retval Negative failed
  */
 int print_cluster(struct super_block *sb, off_t index, size_t count)
 {
