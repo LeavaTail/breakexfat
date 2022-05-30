@@ -79,7 +79,8 @@ struct inode {
 #define BOOTSEC_ZERO_LEN      53 //!< length of MustBeZero
 
 #define FILENAME_LEN     15  //!< length of the maximum FileName in dentry
-#define MAX_NAME_LENGTH  255 //!< length of the maximum FileName
+#define FILENAME_NUM     17  //!< the maximum number of File Name dentries
+#define MAX_NAME_LENGTH  (FILENAME_LEN * FILENAME_NUM) //!< length of the maximum FileName
 
 /**
  * boot-strapping from an exFAT volume (512 bytes)
