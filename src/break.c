@@ -23,6 +23,7 @@ static int break_boot_partoff(struct super_block *sb, struct cache *cache, int t
 static int break_boot_vollen(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int type);
+static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -36,6 +37,8 @@ static struct break_pattern_information break_boot_info[] =
 	{"Too large FatOffset", false, 1, break_boot_fatoff},
 	{"Too small FatLength", false, 0, break_boot_fatlen},
 	{"Too large FatLength", false, 1, break_boot_fatlen},
+	{"Too small ClusterHeapOffset", false, 0, break_boot_cluoff},
+	{"Too large ClusterHeapOffset", false, 1, break_boot_cluoff},
 };
 
 /**
@@ -228,6 +231,35 @@ static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int ty
 			break;
 		case 1:
 			boot->fat_length = (sb->heap_offset - sb->fat_offset) / sb->num_fats + 1;
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break ClusterHeapOffset in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int type)
+{
+	struct boot_sector *boot;
+
+	boot = cache->data;
+	switch (type) {
+			case 0:
+			boot->clu_offset = (sb->fat_offset + sb->fat_length * sb->num_fats) - 1;
+			break;
+		case 1:
+			boot->clu_offset = UINT32_MAX;
 			break;
 		default:
 			return -EINVAL;
