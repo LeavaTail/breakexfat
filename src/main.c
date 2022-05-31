@@ -122,8 +122,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	fill_super(&sb, argv[1]);
+	if (fill_super(&sb, argv[1]))
+		goto out;
+
 	parse_break_pattern(&sb, argv[2]);
+out:
 	put_super(&sb);
 
 	return 0;
