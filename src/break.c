@@ -21,6 +21,7 @@ static int break_boot_fsname(struct super_block *sb, struct cache *cache, int ty
 static int break_boot_zero(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_partoff(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_vollen(struct super_block *sb, struct cache *cache, int type);
+static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -30,6 +31,8 @@ static struct break_pattern_information break_boot_info[] =
 	{"Not zero in MustBeZero", false, 0, break_boot_zero},
 	{"Invalid PartitionOffset", false, 0, break_boot_partoff},
 	{"Too small VolumeLength", false, 0, break_boot_vollen},
+	{"Too small FatOffset", false, 0, break_boot_fatoff},
+	{"Too large FatOffset", false, 1, break_boot_fatoff},
 };
 
 /**
@@ -171,3 +174,31 @@ static int break_boot_vollen(struct super_block *sb, struct cache *cache, int ty
 	return 0;
 }
 
+/**
+ * @brief break FatOffset in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type)
+{
+	struct boot_sector *boot;
+
+	boot = cache->data;
+	switch (type) {
+		case 0:
+			boot->fat_offset = 24 - 1;
+			break;
+		case 1:
+			boot->fat_offset = sb->heap_offset - (sb->fat_length * sb->num_fats) + 1;
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
