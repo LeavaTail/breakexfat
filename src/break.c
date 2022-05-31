@@ -13,18 +13,18 @@ struct break_pattern_information {
 	char *name;
 	bool choice;
 	int type;
-	int (*func)(struct super_block *, struct cache *, int);
+	int (*func)(struct super_block *, int);
 };
 
-static int break_boot_jumpboot(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_fsname(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_zero(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_partoff(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_vollen(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int type);
-static int break_boot_clucount(struct super_block *sb, struct cache *cache, int type);
+static int break_boot_jumpboot(struct super_block *sb, int type);
+static int break_boot_fsname(struct super_block *sb, int type);
+static int break_boot_zero(struct super_block *sb, int type);
+static int break_boot_partoff(struct super_block *sb, int type);
+static int break_boot_vollen(struct super_block *sb, int type);
+static int break_boot_fatoff(struct super_block *sb, int type);
+static int break_boot_fatlen(struct super_block *sb, int type);
+static int break_boot_cluoff(struct super_block *sb, int type);
+static int break_boot_clucount(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -89,8 +89,9 @@ int disable_break_pattern(struct super_block *sb, unsigned int index)
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_jumpboot(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_jumpboot(struct super_block *sb, int type)
 {
+	struct cache *cache = get_sector_cache(sb, 0);
 	struct boot_sector *boot = cache->data;
 
 	boot->jmp_boot[0] = 0xFF;
@@ -110,11 +111,11 @@ static int break_boot_jumpboot(struct super_block *sb, struct cache *cache, int 
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_fsname(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_fsname(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	memcpy(boot->fs_name, "        ", BOOTSEC_FSNAME_LEN);
 	cache->dirty = true;
 
@@ -130,12 +131,12 @@ static int break_boot_fsname(struct super_block *sb, struct cache *cache, int ty
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_zero(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_zero(struct super_block *sb, int type)
 {
 	int i;
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	for (i = 0; i < BOOTSEC_ZERO_LEN; i++)
 		boot->must_be_zero[i] = 0xff;
 	cache->dirty = true;
@@ -152,11 +153,11 @@ static int break_boot_zero(struct super_block *sb, struct cache *cache, int type
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_partoff(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_partoff(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	boot->partition_offset = ULONG_MAX;
 	cache->dirty = true;
 
@@ -172,11 +173,11 @@ static int break_boot_partoff(struct super_block *sb, struct cache *cache, int t
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_vollen(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_vollen(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	boot->vol_length = (power2(20) / sb->sector_size) - 1;
 	cache->dirty = true;
 
@@ -192,11 +193,11 @@ static int break_boot_vollen(struct super_block *sb, struct cache *cache, int ty
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_fatoff(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	switch (type) {
 		case 0:
 			boot->fat_offset = 24 - 1;
@@ -221,12 +222,12 @@ static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int ty
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_fatlen(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 	uint64_t clu_nums;
 
-	boot = cache->data;
 	clu_nums = sb->cluster_count + EXFAT_FIRST_CLUSTER;
 	switch (type) {
 		case 0:
@@ -252,11 +253,11 @@ static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int ty
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_cluoff(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	switch (type) {
 			case 0:
 			boot->clu_offset = (sb->fat_offset + sb->fat_length * sb->num_fats) - 1;
@@ -281,11 +282,11 @@ static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int ty
  * @retval 0 success
  * @retval Negative failed
  */
-static int break_boot_clucount(struct super_block *sb, struct cache *cache, int type)
+static int break_boot_clucount(struct super_block *sb, int type)
 {
-	struct boot_sector *boot;
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
 
-	boot = cache->data;
 	switch (type) {
 			case 0:
 			boot->clu_count = (sb->vol_size + sb->heap_offset) / (sb->cluster_size / sb->sector_size) - 1;
