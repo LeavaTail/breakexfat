@@ -24,6 +24,7 @@ static int break_boot_vollen(struct super_block *sb, struct cache *cache, int ty
 static int break_boot_fatoff(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_fatlen(struct super_block *sb, struct cache *cache, int type);
 static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int type);
+static int break_boot_clucount(struct super_block *sb, struct cache *cache, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -39,6 +40,8 @@ static struct break_pattern_information break_boot_info[] =
 	{"Too large FatLength", false, 1, break_boot_fatlen},
 	{"Too small ClusterHeapOffset", false, 0, break_boot_cluoff},
 	{"Too large ClusterHeapOffset", false, 1, break_boot_cluoff},
+	{"Too small ClusterCount", false, 0, break_boot_clucount},
+	{"Too large ClusterCount", false, 1, break_boot_clucount},
 };
 
 /**
@@ -260,6 +263,35 @@ static int break_boot_cluoff(struct super_block *sb, struct cache *cache, int ty
 			break;
 		case 1:
 			boot->clu_offset = UINT32_MAX;
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break ClusterCount in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] cache boot sector cache
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_clucount(struct super_block *sb, struct cache *cache, int type)
+{
+	struct boot_sector *boot;
+
+	boot = cache->data;
+	switch (type) {
+			case 0:
+			boot->clu_count = (sb->vol_size + sb->heap_offset) / (sb->cluster_size / sb->sector_size) - 1;
+			break;
+		case 1:
+			boot->clu_offset = power2(32) - 11 + 1;
 			break;
 		default:
 			return -EINVAL;
