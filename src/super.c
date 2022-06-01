@@ -186,8 +186,7 @@ int fill_super(struct super_block *sb, const char *name)
 	sb->total_size = stat.st_size;
 	sb->alloc_second = 0;
 
-	if (read_boot_sector(sb)) {
-		ret = -errno;
+	if ((ret = read_boot_sector(sb)) != 0) {
 		goto err;
 	}
 
@@ -198,6 +197,7 @@ int fill_super(struct super_block *sb, const char *name)
 
 	if ((root = read_root_dir(sb)) == NULL) {
 		pr_err("Failed to load inodes\n");
+		ret = -EINVAL;
 		goto err_put;
 	}
 
