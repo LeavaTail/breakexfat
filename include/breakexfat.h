@@ -151,6 +151,7 @@ int remove_cache_list(struct super_block *sb, struct list_head *head);
 int enable_break_pattern(struct super_block *sb, unsigned int index);
 int disable_break_pattern(struct super_block *sb, unsigned int index);
 int enable_break_all_pattern(struct super_block *sb);
+int run_break(struct super_block *sb);
 
 int update_active_fat(struct super_block *sb, int index);
 int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry);

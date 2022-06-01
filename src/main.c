@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
 	else
 		parse_break_pattern(&sb, argv[2]);
 
+	run_break(&sb);
 out:
 	put_super(&sb);
 

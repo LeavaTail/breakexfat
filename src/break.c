@@ -99,6 +99,29 @@ int enable_break_all_pattern(struct super_block *sb)
 }
 
 /**
+ * @brief Run break exFAT filesystem image
+ * @param [in] sb    Filesystem metadata
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+int run_break(struct super_block *sb)
+{
+	int i;
+	struct break_pattern_information tmp;
+
+	for (i = 0; i < sizeof(break_boot_info) / sizeof(break_boot_info[0]); i++) {
+		tmp = break_boot_info[i];
+		if (tmp.choice) {
+			pr_msg("Break pattern: %s\n", tmp.name);
+			tmp.func(sb, tmp.choice);
+		}
+	}
+
+	return 0;
+}
+
+/**
  * @brief break jumoboot in boot sector
  * @param [in] sb    Filesystem metadata
  * @param [in] cache boot sector cache
