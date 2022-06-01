@@ -124,7 +124,6 @@ int run_break(struct super_block *sb)
 /**
  * @brief break jumoboot in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -146,7 +145,6 @@ static int break_boot_jumpboot(struct super_block *sb, int type)
 /**
  * @bried break FileSystemName in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -166,7 +164,6 @@ static int break_boot_fsname(struct super_block *sb, int type)
 /**
  * @brief break MustBeZero in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -188,7 +185,6 @@ static int break_boot_zero(struct super_block *sb, int type)
 /**
  * @brief break PartitionOffset in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -208,7 +204,6 @@ static int break_boot_partoff(struct super_block *sb, int type)
 /**
  * @brief break VolumeLength in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -228,7 +223,6 @@ static int break_boot_vollen(struct super_block *sb, int type)
 /**
  * @brief break FatOffset in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -257,7 +251,6 @@ static int break_boot_fatoff(struct super_block *sb, int type)
 /**
  * @brief break FatLength in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -288,7 +281,6 @@ static int break_boot_fatlen(struct super_block *sb, int type)
 /**
  * @brief break ClusterHeapOffset in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
@@ -317,7 +309,6 @@ static int break_boot_cluoff(struct super_block *sb, int type)
 /**
  * @brief break ClusterCount in boot sector
  * @param [in] sb    Filesystem metadata
- * @param [in] cache boot sector cache
  * @param [in] type  break pattern
  *
  * @retval 0 success
