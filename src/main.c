@@ -32,6 +32,7 @@ enum
  */
 static struct option const longopts[] =
 {
+	{"all", no_argument, NULL, 'a'},
 	{0,0,0,0}
 };
 
@@ -42,6 +43,8 @@ static void usage(void)
 {
 	fprintf(stderr, "Usage: %s [OPTION]... FILE [PATTERN,...]\n", PROGRAM_NAME);
 	fprintf(stderr, "break FAT/exFAT filesystem image.\n");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "  -a, --all\tBreak exFAT by all failure.\n");
 	fprintf(stderr, "\n");
 }
 
@@ -98,9 +101,12 @@ int main(int argc, char *argv[])
 	struct super_block sb = {0};
 
 	while ((opt = getopt_long(argc, argv,
-					"",
+					"a",
 					longopts, &longindex)) != -1) {
 		switch (opt) {
+			case 'a':
+				sb.opt |= BIT(OPT_ALL);
+				break;
 			case GETOPT_HELP_CHAR:
 				usage();
 				exit(EXIT_SUCCESS);
@@ -122,10 +128,14 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (fill_super(&sb, argv[1]))
+	if (fill_super(&sb, argv[optind]))
 		goto out;
 
-	parse_break_pattern(&sb, argv[2]);
+	if (sb.opt & BIT(OPT_ALL))
+		enable_break_all_pattern(&sb);
+	else
+		parse_break_pattern(&sb, argv[2]);
+
 out:
 	put_super(&sb);
 

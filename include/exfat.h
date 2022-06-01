@@ -42,6 +42,9 @@ struct super_block {
 	uint32_t upcase_offset; //!< cluster index of the first cluster of the Up-case table
 	uint32_t upcase_size;   //!< length of Up-case table
 
+	/* Meta Data */
+	uint64_t opt;           //!< Command line option
+
 	/* cached list */
 	struct list_head *inodes;       //!< cached inode
 

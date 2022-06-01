@@ -81,6 +81,24 @@ int disable_break_pattern(struct super_block *sb, unsigned int index)
 }
 
 /**
+ * @brief Enable All break pattern
+ * @param [in] sb    Filesystem metadata
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+int enable_break_all_pattern(struct super_block *sb)
+{
+	int i;
+
+	for (i = 0; i < sizeof(break_boot_info)/sizeof(break_boot_info[0]); i++)
+		if (enable_break_pattern(sb, i))
+			return -EINVAL;
+
+	return 0;
+}
+
+/**
  * @brief break jumoboot in boot sector
  * @param [in] sb    Filesystem metadata
  * @param [in] cache boot sector cache

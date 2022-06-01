@@ -59,6 +59,13 @@ enum {
 #define pr_msg(fmt, ...)   fprintf(stdout, fmt, ##__VA_ARGS__)       //!< normal message
 
 /**
+ * Command line option
+ */
+enum {
+	OPT_ALL,      //!< All failure
+};
+
+/**
  * Cached data (sector/cluster)
  */
 struct cache {
@@ -143,6 +150,7 @@ int remove_cache_list(struct super_block *sb, struct list_head *head);
 
 int enable_break_pattern(struct super_block *sb, unsigned int index);
 int disable_break_pattern(struct super_block *sb, unsigned int index);
+int enable_break_all_pattern(struct super_block *sb);
 
 int update_active_fat(struct super_block *sb, int index);
 int get_fat_entry(struct super_block *sb, uint32_t clu, uint32_t *entry);
