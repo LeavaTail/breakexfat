@@ -27,6 +27,7 @@ static int break_boot_cluoff(struct super_block *sb, int type);
 static int break_boot_clucount(struct super_block *sb, int type);
 static int break_boot_rootclu(struct super_block *sb, int type);
 static int break_boot_fsrev(struct super_block *sb, int type);
+static int break_boot_volflags(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -49,6 +50,10 @@ static struct break_pattern_information break_boot_info[] =
 	{"Invalid FirstClusterOfRootDirectory", false, 2, break_boot_rootclu},
 	{"Too small FileSystemRevision", false, 0, break_boot_fsrev},
 	{"Too large FileSystemRevision", false, 1, break_boot_fsrev},
+	{"Set ActiveFat in VolumeFlags", false, 0, break_boot_volflags},
+	{"Set VolumeDirty in VolumeFlags", false, 1, break_boot_volflags},
+	{"Set MediaFailure in VolumeFlags", false, 2, break_boot_volflags},
+	{"Set ClearToZero in VolumeFlags", false, 3, break_boot_volflags},
 };
 
 /**
@@ -393,6 +398,40 @@ static int break_boot_fsrev(struct super_block *sb, int type)
 		case 1:
 			boot->fs_revision[0] = 0x99;
 			boot->fs_revision[1] = 0x99;
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break VolumeFlags in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_volflags(struct super_block *sb, int type)
+{
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
+
+	switch (type) {
+		case 0:
+			boot->vol_flags |= BIT(0);
+			break;
+		case 1:
+			boot->vol_flags |= BIT(1);
+			break;
+		case 2:
+			boot->vol_flags |= BIT(2);
+			break;
+		case 3:
+			boot->vol_flags |= BIT(3);
 			break;
 		default:
 			return -EINVAL;
