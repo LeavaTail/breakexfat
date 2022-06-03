@@ -26,6 +26,7 @@ static int break_boot_fatlen(struct super_block *sb, int type);
 static int break_boot_cluoff(struct super_block *sb, int type);
 static int break_boot_clucount(struct super_block *sb, int type);
 static int break_boot_rootclu(struct super_block *sb, int type);
+static int break_boot_fsrev(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -46,6 +47,8 @@ static struct break_pattern_information break_boot_info[] =
 	{"Too small FirstClusterOfRootDirectory", false, 0, break_boot_rootclu},
 	{"Too large FirstClusterOfRootDirectory", false, 1, break_boot_rootclu},
 	{"Invalid FirstClusterOfRootDirectory", false, 2, break_boot_rootclu},
+	{"Too small FileSystemRevision", false, 0, break_boot_fsrev},
+	{"Too large FileSystemRevision", false, 1, break_boot_fsrev},
 };
 
 /**
@@ -360,6 +363,36 @@ static int break_boot_rootclu(struct super_block *sb, int type)
 			break;
 		case 2:
 			boot->root_cluster++;
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break FileSystemRevision in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_fsrev(struct super_block *sb, int type)
+{
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
+
+	switch (type) {
+		case 0:
+			boot->fs_revision[0] = 0x00;
+			boot->fs_revision[1] = 0x00;
+			break;
+		case 1:
+			boot->fs_revision[0] = 0x99;
+			boot->fs_revision[1] = 0x99;
 			break;
 		default:
 			return -EINVAL;
