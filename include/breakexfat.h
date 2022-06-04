@@ -109,6 +109,20 @@ static inline uint64_t power2(uint32_t n)
 }
 
 /**
+ * @brief eveluate power of 2
+ * @param [in] n target value
+ *
+ * @return  power of 2
+ */
+static inline uint32_t log_2(uint32_t n)
+{
+	uint32_t i = 0;
+
+	for (i = 0; n > 1; n >>= 1, i++);
+	return i;
+}
+
+/**
  * @brief check if @clu is valid cluster
  * @param [in] sb  Filesystem metadata
  * @param [in] clu target cluster index

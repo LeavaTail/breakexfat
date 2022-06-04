@@ -28,6 +28,7 @@ static int break_boot_clucount(struct super_block *sb, int type);
 static int break_boot_rootclu(struct super_block *sb, int type);
 static int break_boot_fsrev(struct super_block *sb, int type);
 static int break_boot_volflags(struct super_block *sb, int type);
+static int break_boot_bps(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -54,6 +55,8 @@ static struct break_pattern_information break_boot_info[] =
 	{"Set VolumeDirty in VolumeFlags", false, 1, break_boot_volflags},
 	{"Set MediaFailure in VolumeFlags", false, 2, break_boot_volflags},
 	{"Set ClearToZero in VolumeFlags", false, 3, break_boot_volflags},
+	{"Too small BytesPerSectorShift", false, 0, break_boot_bps},
+	{"Too large BytesPerSectorShift", false, 1, break_boot_bps},
 };
 
 /**
@@ -432,6 +435,34 @@ static int break_boot_volflags(struct super_block *sb, int type)
 			break;
 		case 3:
 			boot->vol_flags |= BIT(3);
+			break;
+		default:
+			return -EINVAL;
+	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break BytesPerSectorShift in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_bps(struct super_block *sb, int type)
+{
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
+
+	switch (type) {
+		case 0:
+			boot->sect_size_bits = log_2(EXFAT_SECTOR_MIN) - 1;
+			break;
+		case 1:
+			boot->sect_size_bits = log_2(EXFAT_SECTOR_MAX) + 1;
 			break;
 		default:
 			return -EINVAL;

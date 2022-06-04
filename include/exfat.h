@@ -18,6 +18,9 @@
 #define EXFAT_BADCLUSTER     0xFFFFFFF7  //!< FATentry's corresponding cluster as "bad"
 #define EXFAT_LASTCLUSTER    0xFFFFFFFF  //!< cluster as the last cluster of a cluster chain
 
+#define EXFAT_SECTOR_MIN     512         //!< 512 bytes is minimum sector
+#define EXFAT_SECTOR_MAX     4096        //!< 4096 bytes is maximum sector
+
 /**
  * information about the enclosing target exFAT filesystem
  */
