@@ -32,6 +32,7 @@ static int break_boot_bps(struct super_block *sb, int type);
 static int break_boot_spc(struct super_block *sb, int type);
 static int break_boot_numfats(struct super_block *sb, int type);
 static int break_boot_inuse(struct super_block *sb, int type);
+static int break_boot_bootcode(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -64,6 +65,7 @@ static struct break_pattern_information break_boot_info[] =
 	{"Too small NumberOfFats", false, 0, break_boot_numfats},
 	{"Too large NumberOfFats", false, 1, break_boot_numfats},
 	{"Too large PercentInUse", false, 0, break_boot_inuse},
+	{"Invalid BootCode", false, 0, break_boot_bootcode},
 };
 
 /**
@@ -540,6 +542,25 @@ static int break_boot_inuse(struct super_block *sb, int type)
 	struct boot_sector *boot = cache->data;
 
 	boot->percent_in_use = 100 + 1;
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break BootCode in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_bootcode(struct super_block *sb, int type)
+{
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
+
+	memset(boot->boot_code, 0, 390);
 	cache->dirty = true;
 
 	return 0;
