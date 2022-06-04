@@ -20,6 +20,7 @@
 
 #define EXFAT_SECTOR_MIN     512         //!< 512 bytes is minimum sector
 #define EXFAT_SECTOR_MAX     4096        //!< 4096 bytes is maximum sector
+#define EXFAT_CLUSTER_MAX    (32* 1024 * 1024)  //!< 32 Mega bytes is maximum cluster
 
 /**
  * information about the enclosing target exFAT filesystem

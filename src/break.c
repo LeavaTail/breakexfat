@@ -29,6 +29,7 @@ static int break_boot_rootclu(struct super_block *sb, int type);
 static int break_boot_fsrev(struct super_block *sb, int type);
 static int break_boot_volflags(struct super_block *sb, int type);
 static int break_boot_bps(struct super_block *sb, int type);
+static int break_boot_spc(struct super_block *sb, int type);
 
 //! Array for break pattern information
 static struct break_pattern_information break_boot_info[] =
@@ -57,6 +58,7 @@ static struct break_pattern_information break_boot_info[] =
 	{"Set ClearToZero in VolumeFlags", false, 3, break_boot_volflags},
 	{"Too small BytesPerSectorShift", false, 0, break_boot_bps},
 	{"Too large BytesPerSectorShift", false, 1, break_boot_bps},
+	{"Too large SectorPerClusterShift", false, 0, break_boot_spc},
 };
 
 /**
@@ -467,6 +469,25 @@ static int break_boot_bps(struct super_block *sb, int type)
 		default:
 			return -EINVAL;
 	}
+	cache->dirty = true;
+
+	return 0;
+}
+
+/**
+ * @brief break SectorPerClusterShift in boot sector
+ * @param [in] sb    Filesystem metadata
+ * @param [in] type  break pattern
+ *
+ * @retval 0 success
+ * @retval Negative failed
+ */
+static int break_boot_spc(struct super_block *sb, int type)
+{
+	struct cache *cache = get_sector_cache(sb, 0);
+	struct boot_sector *boot = cache->data;
+
+	boot->sect_per_clus_bits = log_2(EXFAT_CLUSTER_MAX) - boot->sect_size_bits + 1;
 	cache->dirty = true;
 
 	return 0;
