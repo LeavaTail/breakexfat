@@ -6,7 +6,8 @@ breakexfat_SOURCES = src/main.c \
 			src/cache.c \
 			src/break.c \
 			src/fatent.c \
-			src/balloc.c
+			src/balloc.c \
+			src/utf8.c
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
