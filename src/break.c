@@ -118,8 +118,9 @@ int enable_break_all_pattern(struct super_block *sb)
 	int i;
 
 	for (i = 0; i < sizeof(break_boot_info)/sizeof(break_boot_info[0]); i++)
-		if (enable_break_pattern(sb, i))
-			return -EINVAL;
+		if (break_boot_info[i].choice == 0)
+			if (enable_break_pattern(sb, i))
+				return -EINVAL;
 
 	return 0;
 }
